@@ -163,6 +163,7 @@ setInterval(function(){
                 temperature:  [ { value: data.temperature, timestamp: data.timestamp } ],
                 rssi:  [ { value: data.rssi, timestamp: data.timestamp }],
                 moving:  [ { value: data.moving, timestamp: data.timestamp } ],
+                crowdcount:  [ { value: data.crowdcount, timestamp: data.timestamp } ]
             };
             console.log("sending: to M2X");
 
@@ -292,7 +293,7 @@ EstimoteSticker.on('discover', function(estimoteSticker) {
 
 	var nNodes = Object.keys(nodelist).length;
 
-	if (nCloseNodes / nNodes > 0.5) {
+	if (nCloseNodes / nNodes > 0.5 && nCloseNodes >3) {
 		if (bDanceMode === 0) {
 			bDanceMode = 1;
 		    currentVolume = 40;
@@ -315,7 +316,8 @@ EstimoteSticker.on('discover', function(estimoteSticker) {
         "temperature": estimoteSticker.temperature,
         "rssi": estimoteSticker.rssi,
         "moving": estimoteSticker.moving==true?1:0,
-         "timestamp" : at
+         "timestamp" : at,
+        "crowdcount": nCloseNodes
             
     };
         dataCache.push(output);
