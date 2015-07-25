@@ -6,9 +6,7 @@ app.use(bodyParser.json());
 var port = process.env.PORT || 1337;
 
 app.get('/', function (req, res) {
-
   res.send("server is running, this is root pah");
-
 });
 
 var harmonIp = '';
@@ -45,6 +43,7 @@ var volumeCounter = 0;
 //Key is genre name, value is vote count
 var genreCounter = {};
 var crowdCounter =0;
+var currentSong = {};
 //Cached Data to poll to M2X
 var dataCache = [];
 
@@ -69,9 +68,9 @@ setInterval(function(){
             m2xClient.devices.postMultiple(config.device, values, function(result) {
                 console.log(result);
             });
-              
+
           }
-            
+
 }, 4000);
 
 //SocketIO setup
@@ -80,7 +79,8 @@ var io = require('socket.io')(server);
 io.on('connection', function (socket) {
   var currentState = {
     "volume": volumeCounter,
-    "genre": genreCounter
+    "genre": genreCounter,
+    "currentSong": currentSong
   };
   socket.emit('connected', currentState);
   sockets.push(socket);
@@ -96,7 +96,7 @@ io.on('connection', function (socket) {
         break;
     }
 
-    socket.emit('volume', volumeCounter);
+    io.emit('volume', volumeCounter, { for: 'everyone' });
   });
 
   socket.on('genre', function (data) {
@@ -113,7 +113,13 @@ io.on('connection', function (socket) {
         break;
     }
     console.log(JSON.stringify(genreCounter));
-    socket.emit('genre', genreCounter);
+    io.emit('genre', genreCounter, { for: 'everyone' });
+  });
+
+  socket.on('change_song', function(data) {
+    currentSong = data;
+
+    io.emit('change_song', currentSong, { for: 'everyone' });
   });
 
 
