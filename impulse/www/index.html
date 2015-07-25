@@ -27,12 +27,16 @@
   </head>
   <body ng-app="impulse" ng-controller="TheController as main">
 
+    <div class="status-bar"></div>
+
     <ion-pane>
       <ion-content>
         <section>
           <h3 class="playing">Now Playing</h3>
 
-          <figure class="current-cover">
+          <figure class="current-cover"
+            on-swipe-left="main.previousSong()"
+            on-swipe-right="main.nextSong()">
             <img ng-src="data:image/jpeg;base64, {{main.currentSong.ArtWork}}" alt="">
 
             <figcaption>
@@ -40,8 +44,12 @@
               {{main.currentSong.Artist}}
             </figcaption>
 
-            <a class="button right ion-chevron-right button-clear"></a>
-            <a class="button left ion-chevron-left button-clear"></a>
+            <a class="button right ion-chevron-right button-clear"
+              ng-click="main.nextSong()">
+            </a>
+            <a class="button left ion-chevron-left button-clear"
+              ng-click="main.previousSong()">
+            </a>
           </figure>
 
           <div class="actions">
