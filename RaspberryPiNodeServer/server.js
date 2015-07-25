@@ -5,25 +5,124 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 var port = process.env.PORT || 1337;
 
+var request = require('request');
+
 app.get('/', function (req, res) {
   res.send("server is running, this is root pah");
 });
 
-var harmonIp = '';
-var harmonSession ='';
+var harmonIp = 'http://10.0.1.13:8080';
+var harmonSession = '';
+var currentVolume = 0;
+var playLists = [];
+var currentPlayingId = 0;
+
+request(harmonIp + '/v1/init_session', function(error, resp, body) {
+  if (!error && resp.statusCode == 200) {
+    console.log(body);
+    harmonSession = JSON.parse(body).SessionID;
+    console.log('Connect to Harmon -- session id ' + harmonSession);
+
+    request(
+      harmonIp + '/v1/get_volume?SessionID=1000',
+      function(error, resp, body) {
+        currentVolume = JSON.parse(body).Volume;
+        console.log('Current Volume ' + currentVolume);
+      }
+    );
+
+    request(
+      harmonIp + '/v1/media_list?SessionID=' + harmonSession,
+      function(err, res, body) {
+        playLists = JSON.parse(body).MediaList;
+
+        console.log('Got play list:');
+        console.log(playLists);
+      }
+    );
+  } else {
+    console.log('Failed to connect to Harmon');
+    console.log(error);
+  }
+});
+
 app.post('/myo_command/:command', function (req, res) {
   var command = req.param("command");
   console.log("myo)_command: "+command);
   switch (command) {
     case "volume_up":
+      currentVolume += 5;
+      request(harmonIp + '/v1/set_volume?SessionID=' + harmonSession +
+        '&Volume=' + currentVolume, function(err, res, body) {
+          console.log('Volume changed to ' + currentVolume);
+        });
       break;
     case "volume_down":
+      currentVolume -= 5;
+      request(harmonIp + '/v1/set_volume?SessionID=' + harmonSession +
+        '&Volume=' + currentVolume, function(err, res, body) {
+          if (!err) {
+            console.log('Volume changed to ' + currentVolume);
+          }
+        });
       break;
     case "next_track":
+      if (currentPlayingId < playLists.length - 1) {
+        currentPlayingId ++;
+      } else {
+        currentPlayingId = 0;
+      }
+      request(
+        harmonIp + '/v1/play_hub_media?SessionID=' + harmonSession +
+          '&PersistentID=' + playLists[currentPlayingId].PersistentID,
+        function(err, res, body) {
+          if (!err) {
+            console.log('Start playing song');
+          }
+        });
+      io.emit('change_song',
+        {
+          PersistentID: playLists[currentPlayingId].PersistentID
+        },
+        { for: 'everyone' }
+      );
       break;
     case "previous_track":
+      if (currentPlayingId > 0) {
+        currentPlayingId --;
+      } else {
+        currentPlayingId = playLists.length - 1;
+      }
+      request(
+        harmonIp + '/v1/play_hub_media?SessionID=' + harmonSession +
+          '&PersistentID=' + playLists[currentPlayingId].PersistentID,
+        function(err, res, body) {
+          if (!err) {
+            console.log('Start playing song');
+          }
+        });
+      io.emit('change_song',
+        {
+          PersistentID: playLists[currentPlayingId].PersistentID
+        },
+        { for: 'everyone' }
+      );
       break;
     case "play":
+      request(
+        harmonIp + '/v1/play_hub_media?SessionID=' + harmonSession +
+          '&PersistentID=' + playLists[currentPlayingId].PersistentID,
+        function(err, res, body) {
+          if (!err) {
+            console.log('Start playing song');
+          }
+        });
+      io.emit('change_song',
+        {
+          PersistentID: playLists[currentPlayingId].PersistentID
+        },
+        { for: 'everyone' }
+      );
       break;
     case "start_stop":
       break;
