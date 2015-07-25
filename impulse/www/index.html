@@ -54,9 +54,17 @@
             <button class="icon ion-ios-plus-empty button">
             </button>
             <span class="fill-space"></span>
-            <button class="button ion-thumbsdown with-right-margin">
+            <button class="button ion-thumbsdown with-right-margin"
+              ng-class="{
+                'active': main.downvoted
+              }"
+              ng-click="main.downvote()">
             </button>
-            <button class="button ion-thumbsup">
+            <button class="button ion-thumbsup"
+              ng-class="{
+                'active': main.upvoted
+              }"
+              ng-click="main.upvote()">
             </button>
           </div>
 
@@ -65,15 +73,19 @@
 
             <div class="row">
               <div class="left">
-                <button class="icon ion-ios-minus-empty button"></button>
+                <button class="icon ion-ios-minus-empty button"
+                  ng-click="main.downVoteVolume()">
+                </button>
               </div>
               <div class="right">
-                <button class="icon ion-ios-plus-empty button"></button>
+                <button class="icon ion-ios-plus-empty button"
+                  ng-click="main.upVoteVolume()">
+                </button>
               </div>
             </div>
 
-            <svg class="feedback-bar" width="100" height="20" viewBox="0 0 320 20" xmlns="http://www.w3.org/2000/svg">
-              <rect x="164" y="4" width="50" height="12" style="
+            <svg class="volume feedback-bar" viewBox="0 0 320 20" xmlns="http://www.w3.org/2000/svg">
+              <rect class="progress" x="164" y="4" width="50" height="12" style="
                 fill: #00FF86;
               "></rect>
               <rect x="159" y="0" width="2" height="20" style="
@@ -87,20 +99,20 @@
 
             <div class="dropdown"
               ng-click="main.toggleDropdown()">
-              <span>Electronic</span>
+              <span>{{main.currentGenre}}</span>
               <i class="icon ion-ios-arrow-down"></i>
 
               <div class="dropdown-menu">
-                <div class="dropdown-item">Test</div>
-                <div class="dropdown-item">Test</div>
-                <div class="dropdown-item">Test</div>
-                <div class="dropdown-item">Test</div>
-                <div class="dropdown-item">Test</div>
+                <div class="dropdown-item"
+                  ng-repeat="genre in main.genres"
+                  ng-click="main.updateCurrentGenre(genre)">
+                  {{genre}}
+                </div>
               </div>
             </div>
 
-            <svg class="feedback-bar" width="100" height="20" viewBox="0 0 320 20" xmlns="http://www.w3.org/2000/svg">
-              <rect x="164" y="4" width="50" height="12" style="
+            <svg class="genre feedback-bar" viewBox="0 0 320 20" xmlns="http://www.w3.org/2000/svg">
+              <rect class="progress" x="164" y="4" width="50" height="12" style="
                 fill: #00FF86;
               "></rect>
               <rect x="159" y="0" width="2" height="20" style="
