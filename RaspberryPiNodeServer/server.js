@@ -11,6 +11,29 @@ app.get('/', function (req, res) {
 
 });
 
+
+app.post('/myo_command/:command', function (req, res) {
+  var command = req.param("command");
+  console.log(command);
+  switch (command) {
+    case "volume_up":
+      break;
+    case "volume_down":
+      break;
+    case "next_track":
+      break;
+    case "previous_track":
+      break;
+    case "play":
+      break;
+    case "start_stop":
+      break;
+  }
+
+
+
+});
+
 var server = app.listen(port, function () {
   var host = server.address().address;
   var port = server.address().port;
@@ -65,22 +88,7 @@ io.on('connection', function (socket) {
     socket.emit('genre', genreCounter);
   });
 
-  socket.on('myo_command', function (data) {
-    switch (data) {
-      case "volume_up":
-        break;
-      case "volume_down":
-        break;
-      case "next_track":
-        break;
-      case "previous_track":
-        break;
-      case "play":
-        break;
-      case "Start/Stop":
-        break;
-    }
-  });
+
 
 
 });

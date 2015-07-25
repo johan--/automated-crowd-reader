@@ -34,7 +34,7 @@ namespace MyoSharp.ConsoleSample
     internal class BasicSetupExample
     {
         private static WebRequest _webRequest;
-        private static string _destinationUrl = "http://localhost:1337/";
+        private static string _destinationUrl = "http://localhost:1337/myo_command/";
         private static bool _enableWebTransmission = false;
 
         #region Methods
@@ -83,25 +83,25 @@ namespace MyoSharp.ConsoleSample
             {
                 case Poses.Pose.WaveIn:
                     Console.WriteLine("Previous Track");
-                    requestUri += "{ \"musicCommand\": \"previous_track\"}";
+                    requestUri += "previous_track";
                     break;
                 case Poses.Pose.WaveOut:
                     Console.WriteLine("Next Track");
-                    requestUri += "{ \"musicCommand\": \"next_track\"}";
+                    requestUri += "next_track";
                     break;
                 case Poses.Pose.FingersSpread:
                      Console.WriteLine("Volume Up");
-                    requestUri += "{ \"musicCommand\": \"volume_up\"}";
+                    requestUri += "volume_up";
                    break;
                 case Poses.Pose.Fist:
                      Console.WriteLine("Volume Down");
-                    requestUri += "{ \"musicCommand\": \"volume_down\"}";
+                    requestUri += "volume_down";
                     break;
                 case Poses.Pose.Rest:
                     break;
                 case Poses.Pose.DoubleTap:
-                    _webRequest = WebRequest.Create(_destinationUrl);
-                     Console.WriteLine("Start/Stop");
+                     Console.WriteLine("start_stop");
+                     requestUri += "";
                     break;
                 default:
                     break;
@@ -111,6 +111,7 @@ namespace MyoSharp.ConsoleSample
                 try
                 {
                     _webRequest = WebRequest.Create(requestUri);
+                    _webRequest.Method = "POST";
                     WebResponse response = _webRequest.GetResponse();
                 }
                 catch (Exception ex)
