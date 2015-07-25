@@ -126,7 +126,7 @@ io.on('connection', function (socket) {
 
 
 });
-/* format:
+/* format(uuid is unique):
 { id: '721e8bed36a69719',
   uuid: 'd0d3fa86ca7645ec9bd96af4721e8bed36a69719',
   type: 'SB0',
@@ -142,9 +142,12 @@ io.on('connection', function (socket) {
   firmwareState: 'app',
   rssi: -81 }
 */
+var estimoteStickers = {};
 var EstimoteSticker = require('./estimote-sticker');
 EstimoteSticker.on('discover', function(estimoteSticker) {
-  console.log(estimoteSticker);
+ // console.log(estimoteSticker);
+   estimoteStickers[estimoteSticker.uuid] = estimoteSticker.id;
+   console.log(JSON.stringify(estimoteStickers));
 });
 
 EstimoteSticker.startScanning();
