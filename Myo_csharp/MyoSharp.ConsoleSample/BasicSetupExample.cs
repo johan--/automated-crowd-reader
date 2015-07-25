@@ -34,7 +34,7 @@ namespace MyoSharp.ConsoleSample
     internal class BasicSetupExample
     {
         private static WebRequest _webRequest;
-        private static string _destinationUrl = "http://localhost/";
+        private static string _destinationUrl = "http://localhost:1337/";
         private static bool _enableWebTransmission = false;
 
         #region Methods

@@ -77,7 +77,7 @@ io.on('connection', function (socket) {
         break;
       case "play":
         break;
-      case "pause":
+      case "Start/Stop":
         break;
     }
   });
