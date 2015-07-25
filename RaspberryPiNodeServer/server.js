@@ -21,26 +21,55 @@ var volumeCounter = 0;
 //Key is genre name, value is vote count
 var genreCounter = {};
 //Cached Data to poll to M2X
-var dataCache=[];
+var dataCache = [];
 
 //SocketIO setup
 var sockets = [];
 var io = require('socket.io')(server);
 io.on('connection', function (socket) {
-  socket.emit('connected', 'connected To Raspberry-pi Server');
+  var currentState = {
+    "volume": volumeCounter,
+    "genre": genreCounter
+  };
+  socket.emit('connected', currentState);
   sockets.push(socket);
 
   socket.on('volume', function (data) {
-    console.log(data);
+    console.log("recieved volume: " + data);
+    switch (data) {
+      case "+1":
+        volumeCounter++;
+        break;
+      case "-1":
+        volumeCounter--;
+        break;
+    }
+
+    socket.emit('volume', volumeCounter);
   });
 
   socket.on('genre', function (data) {
-    console.log(data);
+      console.log("recieved genre: " + data);
+      var key = Object.keys(data)[0];
+      switch (data[key]) {
+      case "+1":
+        if(genreCounter[key]==undefined)genreCounter[key]=0;
+        genreCounter[key]++;
+        volumeCounter++;
+        break;
+      case "-1":
+        if(genreCounter[key]==undefined)genreCounter[key]=0;
+        genreCounter[key]--;
+        break;
+    }
+    console.log(JSON.stringify(genreCounter));
+    socket.emit('genre', genreCounter);
   });
-  
-   socket.on('myo_command', function (data) {
+
+  socket.on('myo_command', function (data) {
     console.log(data);
   });
 
 
 });
+
