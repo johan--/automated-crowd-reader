@@ -28,22 +28,16 @@
   <body ng-app="impulse" ng-controller="TheController as main">
 
     <ion-pane>
-      <ion-header-bar class="bar bar-header bar-light">
-        <h1 class="title">
-          Impulse
-        </h1>
-      </ion-header-bar>
-
       <ion-content>
         <section>
           <h3 class="playing">Now Playing</h3>
 
           <figure class="current-cover">
-            <img src="img/ionic.png" alt="">
+            <img ng-src="data:image/jpeg;base64, {{main.currentSong.ArtWork}}" alt="">
 
             <figcaption>
-              Title <br>
-              Band
+              {{main.currentSong.Title}} <br>
+              {{main.currentSong.Artist}}
             </figcaption>
 
             <a class="button right ion-chevron-right button-clear"></a>
@@ -51,7 +45,12 @@
           </figure>
 
           <div class="actions">
-            <button class="icon ion-ios-plus-empty button">
+            <button class="icon ion-ios-plus-empty button"
+              ng-class="{
+                'ion-ios-checkmark-empty': main.isInPersonalAlbum,
+                'ion-ios-plus-empty': !main.isInPersonalAlbum
+              }"
+              ng-click="main.addToPersonalAlbum()">
             </button>
             <span class="fill-space"></span>
             <button class="button ion-thumbsdown with-right-margin"
@@ -89,7 +88,7 @@
                 fill: #00FF86;
               "></rect>
               <rect x="159" y="0" width="2" height="20" style="
-                  fill: #77787C;
+                  fill: #111315;
               "></rect>
             </svg>
           </section>

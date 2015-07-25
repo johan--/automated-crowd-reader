@@ -1,6 +1,28 @@
 /* Empty. Add your own CSS if you like */
+.pane {
+	background-color: #111315;
+	color: #BFCAD0;
+}
+
 .button {
-	border-color: #000;
+	border-color: #BFCAD0;
+	color: #BFCAD0;
+}
+
+.button.active.ion-thumbsdown {
+	background-color: transparent;
+	border-color: #FF00A4;
+	color: #FF00A4;
+}
+
+.button.active.ion-thumbsup {
+	background-color: transparent;
+	border-color: #00FF86;
+	color: #00FF86;
+}
+
+.button.activated {
+	background-color: #212326;
 }
 
 .button-clear.button-clear {
@@ -19,7 +41,9 @@
 }
 
 h3 {
-	font-size: 20px;
+	color: #BFCAD0;
+	font-size: 16px;
+	font-weight: bold;
 	margin-left: 1em;
 	margin-top: .7em !important;
 }
@@ -41,7 +65,7 @@ h3 {
 }
 
 .current-cover {
-	width: 165px;
+	width: 144px;
 	margin: 0 auto;
 	position: relative;
 }
@@ -59,7 +83,7 @@ h3 {
 }
 
 .current-cover > img {
-	height: 165px;
+	height: 144px;
 	-o-object-fit: cover;
 	   object-fit: cover;
 }
@@ -143,7 +167,7 @@ h3 {
     width: 100%;
     margin-bottom: 1em;
     padding: 1em;
-    border: 1px solid #000;
+    border: 1px solid #BFCAD0;
     border-radius: 2px;
     font-size: 16px;
     display: -webkit-box;
@@ -168,7 +192,7 @@ h3 {
 }
 
 .dropdown-menu {
-	background-color: #fff;
+	background-color: #212326;
     position: absolute;
     top: 100%;
     left: 0;
@@ -180,7 +204,7 @@ h3 {
             transform: translateY(-20px);
     -webkit-transition: all .1s ease-in;
             transition: all .1s ease-in;
-    border: 1px solid #000;
+    border: 1px solid #BFCAD0;
     border-radius: 2px;
 }
 
@@ -191,7 +215,7 @@ h3 {
 .feedback-bar {
 	width: 320px;
 	height: 20px;
-	background-color: #E1E2E4;
+	background-color: #212326;
 }
 
 .progress {

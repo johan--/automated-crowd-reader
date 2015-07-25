@@ -1,10 +1,30 @@
 angular.module('impulse.controllers', [])
 
-.controller('TheController', function() {
+.controller('TheController', function($http) {
   var self = this;
   // configure the server ip
-  var SERVER_IP = 'localhost';
+  var SERVER_IP = '10.0.1.14';
   var socket = io.connect('http://' + SERVER_IP + ':1337');
+
+  var HARMAN_SERVER_IP = 'http://10.0.1.13:8080/';
+  $http.get(HARMAN_SERVER_IP + 'v1/init_session')
+    .then(function(response) {
+      self.harmanSession = response.data.SessionID;
+      console.log('Got Session ID: ' + self.harmanSession);
+
+      $http.get(HARMAN_SERVER_IP + 'v1/set_party_mode?SessionID=' + self.harmanSession)
+        .then(function(res) {
+          console.log('Added all speakers to list');
+        });
+
+      $http.get(HARMAN_SERVER_IP + 'v1/media_list?SessionID=' + self.harmanSession)
+        .then(function(res) {
+          console.log('Got play list');
+          console.log(res.data.MediaList);
+          self.playList = res.data.MediaList;
+          self.currentSong = self.playList[0];
+        });
+    });
 
   var volume_vote_dom = document.querySelector('.volume .feedback-bar');
   var genre_vote_dom = document.querySelector('.genre .feedback-bar');
@@ -75,6 +95,10 @@ angular.module('impulse.controllers', [])
       .classList.toggle('open');
   };
 
+  self.addToPersonalAlbum = function() {
+    self.isInPersonalAlbum = !self.isInPersonalAlbum;
+  };
+
   function updateVotes () {
     if (self.currentVolumeVote >= -10 && self.currentVolumeVote <= 10) {
       var vote_dom_progress = volume_vote_dom.querySelector('.progress');
@@ -84,7 +108,7 @@ angular.module('impulse.controllers', [])
         vote_dom_progress
           .setAttribute('x', 156 - Math.abs(self.currentVolumeVote * 15));
         vote_dom_progress
-          .setAttribute('style', 'fill: #FF3E3E');
+          .setAttribute('style', 'fill: #FF00A4');
       } else {
         vote_dom_progress
           .setAttribute('style', 'fill: #00FF86');
