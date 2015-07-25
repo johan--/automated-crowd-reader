@@ -1,5 +1,6 @@
 //Express setup
 var express = require('express');
+var libUtil = require('util');
 var app = express();
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
@@ -241,12 +242,41 @@ io.on('connection', function (socket) {
   firmwareState: 'app',
   rssi: -81 }
 */
-var estimoteStickers = {};
+var nodelist = {};
+var nAverageSamples = 10;
 var EstimoteSticker = require('./estimote-sticker');
 EstimoteSticker.on('discover', function(estimoteSticker) {
  // console.log(estimoteSticker);
-   estimoteStickers[estimoteSticker.uuid] = estimoteSticker.id;
-   console.log(JSON.stringify(estimoteStickers));
+   //nodelist[estimoteSticker.uuid] = estimoteSticker.id;
+   //console.log(JSON.stringify(nodelist));
+
+	var uuid = estimoteSticker.id;
+	var rssi = estimoteSticker.rssi;
+
+	if (!(uuid in nodelist)) {
+		nodelist[uuid] = {rssiarray: []};
+	}
+
+	nodelist[uuid].rssi = rssi;
+
+	var rssiArray = nodelist[uuid].rssiarray;
+	rssiArray.push(rssi);
+
+	if (rssiArray.length > nAverageSamples) {
+		rssiArray.shift();
+	}
+
+	var nRssiTotal = 0;
+	var nRssiEntries = rssiArray.length;
+
+	rssiArray.map(function(curEntry) {
+		nRssiTotal += curEntry;
+	});
+
+	nodelist[uuid].averagerssi = nRssiTotal / nRssiEntries;
+
+	console.log(nodelist[uuid].averagerssi);
 });
 
 EstimoteSticker.startScanning();
+
