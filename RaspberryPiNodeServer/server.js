@@ -5,26 +5,9 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 var port = process.env.PORT || 1337;
 
-
 app.get('/', function (req, res) {
 
-  res.send("hahaha");
-
-});
-
-app.post('/', function (req, res) {
-
-  console.log("reqest: " + JSON.stringify(req.body));
-  res.send("post hahahah");
-
-});
-
-
-app.post('/music_command/:command', function (req, res) {
-
-  var command = req.param("command");
-  console.log("reqest: " + JSON.stringify(req.body));
-  res.send("post hahahah");
+  res.send("server is running, this is root pah");
 
 });
 
@@ -34,10 +17,11 @@ var server = app.listen(port, function () {
   console.log('Raspberry Pi server listening at http://%s:%s', host, port);
 });
 
-
 var volumeCounter = 0;
 //Key is genre name, value is vote count
 var genreCounter = {};
+//Cached Data to poll to M2X
+var dataCache=[];
 
 //SocketIO setup
 var sockets = [];
