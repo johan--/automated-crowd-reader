@@ -1,5 +1,5 @@
 {
-  "name": "cabrini-server",
+  "name": "piserver",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
@@ -8,6 +8,8 @@
   },
   "dependencies": {
     "body-parser": "^1.12.2",
-    "express": "^4.12.3"
+    "express": "^4.12.3",
+    "socket.io":"latest",
+    "m2x":"latest"
   }
 }
