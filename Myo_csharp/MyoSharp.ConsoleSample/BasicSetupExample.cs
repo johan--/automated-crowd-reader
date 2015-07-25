@@ -35,7 +35,7 @@ namespace MyoSharp.ConsoleSample
     {
         private static WebRequest _webRequest;
         private static string _destinationUrl = "http://localhost:1337/myo_command/";
-        private static bool _enableWebTransmission = false;
+        private static bool _enableWebTransmission = true;
 
         #region Methods
         private static void Main()
