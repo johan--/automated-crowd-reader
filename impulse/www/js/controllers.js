@@ -1,10 +1,17 @@
 angular.module('impulse.controllers', [])
 
-.controller('TheController', function($http) {
+.controller('TheController', function($http, $interval) {
   var self = this;
+
+  self.genres = ['Electronic', 'Jazz', 'Metal'];
+  self.currentGenre = self.genres[0];
+  self.currentSongId = 0;
+
   // configure the server ip
   var SERVER_IP = '10.0.1.14';
   var socket = io.connect('http://' + SERVER_IP + ':1337');
+
+  var status_bar_dom = document.querySelector('.status-bar');
 
   var HARMAN_SERVER_IP = 'http://10.0.1.13:8080/';
   $http.get(HARMAN_SERVER_IP + 'v1/init_session')
@@ -22,19 +29,43 @@ angular.module('impulse.controllers', [])
           console.log('Got play list');
           console.log(res.data.MediaList);
           self.playList = res.data.MediaList;
-          self.currentSong = self.playList[0];
+          self.currentSong = self.playList[self.currentSongId];
+
+          self.track_job = $interval(function() {
+            $http.get(HARMAN_SERVER_IP + 'v1/playback_status?SessionID=' + self.harmanSession)
+              .then(function(res) {
+                // dataformat:
+                // {
+                //    "PlaybackState": "PlayerStatePlaying",
+                //    "TimeElapsed": "15"
+                // }
+                console.log(parseInt(res.data.TimeElapsed));
+                console.log(self.currentSong.Duration);
+                var percentage = Math.floor(
+                  parseInt(res.data.TimeElapsed) / self.currentSong.Duration * 100
+                );
+
+                console.log('current play percentage: ' + percentage);
+
+                percentage = (percentage === -1) ? 0 : percentage;
+
+                status_bar_dom.setAttribute(
+                  'style',
+                  'width: ' + percentage + '%'
+                );
+              });
+          }, 1000);
         });
     });
 
   var volume_vote_dom = document.querySelector('.volume .feedback-bar');
   var genre_vote_dom = document.querySelector('.genre .feedback-bar');
 
-  self.genres = ['Electronic', 'Jazz', 'Metal'];
-  self.currentGenre = self.genres[0];
-
   socket.on('connected', function(currentState) {
     self.currentVolumeVote = currentState.volume;
     self.currentGenres = currentState.genre;
+    self.currentSong = currentState.currentSong;
+
     console.log('Got state: ');
     console.log(currentState);
 
@@ -53,6 +84,24 @@ angular.module('impulse.controllers', [])
     console.log(genres);
     updateVotes();
   });
+
+  self.nextSong = function() {
+    if (self.currentSongId < self.playList.length - 1) {
+      self.currentSongId ++;
+    } else {
+      self.currentSongId = 0;
+    }
+    self.currentSong = self.playList[self.currentSongId];
+  };
+
+  self.previousSong = function() {
+    if (self.currentSongId > 0) {
+      self.currentSongId --;
+    } else {
+      self.currentSongId = self.playList.length - 1;
+    }
+    self.currentSong = self.playList[self.currentSongId];
+  };
 
   self.upvote = function() {
     self.upvoted = !self.upvoted;

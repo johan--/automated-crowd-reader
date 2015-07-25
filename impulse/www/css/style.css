@@ -223,3 +223,18 @@ h3 {
 	-o-transition: all .2s ease-in;
 	transition: all .2s ease-in;
 }
+
+.status-bar {
+    -webkit-transition: width 350ms;
+    -moz-transition: width 350ms;
+    -o-transition: width 350ms;
+    transition: width 350ms;
+    background: #00FF86;
+    position: fixed;
+    z-index: 10002;
+    top: 0;
+    left: 0;
+    height: 2px;
+    border-bottom-right-radius: 1px;
+    border-top-right-radius: 1px;
+}
