@@ -27,7 +27,7 @@ request(harmonIp + '/v1/init_session', function(error, resp, body) {
     request(
       harmonIp + '/v1/get_volume?SessionID=1000',
       function(error, resp, body) {
-        currentVolume = JSON.parse(body).Volume;
+        currentVolume = JSON.parse(JSON.parse(body).Volume);
         console.log('Current Volume ' + currentVolume);
       }
     );

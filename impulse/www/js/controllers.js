@@ -8,7 +8,7 @@ angular.module('impulse.controllers', [])
   self.currentSongId = 0;
 
   // configure the server ip
-  var SERVER_IP = '10.0.1.14';
+  var SERVER_IP = '10.0.1.26';
   var socket = io.connect('http://' + SERVER_IP + ':1337');
 
   var status_bar_dom = document.querySelector('.status-bar');
