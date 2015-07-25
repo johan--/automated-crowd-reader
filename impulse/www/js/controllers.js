@@ -24,6 +24,13 @@ angular.module('impulse.controllers', [])
           console.log('Added all speakers to list');
         });
 
+      $http.get(HARMAN_SERVER_IP + 'v1/get_volume?SessionID=' + self.harmanSession)
+        .then(function(res) {
+          console.log(res);
+          self.currentVolume = parseInt(res.data.Volume);
+          console.log('Got volume ' + self.currentVolume);
+        });
+
       $http.get(HARMAN_SERVER_IP + 'v1/media_list?SessionID=' + self.harmanSession)
         .then(function(res) {
           console.log('Got play list');
@@ -68,6 +75,10 @@ angular.module('impulse.controllers', [])
 
     console.log('Got state: ');
     console.log(currentState);
+
+    $interval(function() {
+      refreshVote();
+    }, 3000);
 
     updateVotes();
   });
@@ -147,6 +158,26 @@ angular.module('impulse.controllers', [])
   self.addToPersonalAlbum = function() {
     self.isInPersonalAlbum = !self.isInPersonalAlbum;
   };
+
+  function refreshVote () {
+    if (self.currentVolumeVote > 0) {
+      self.currentVolume += 5;
+      $http.get(HARMAN_SERVER_IP + 'v1/set_volume?SessionID=' + self.harmanSession +
+        '&Volume=' + self.currentVolume)
+        .then(function(res) {
+          console.log('Volume goes up');
+        });
+    } else {
+      self.currentVolume -= 5;
+      $http.get(HARMAN_SERVER_IP + 'v1/set_volume?SessionID=' + self.harmanSession +
+        '&Volume=' + self.currentVolume)
+        .then(function(res) {
+          console.log('Volume goes down');
+        });
+    }
+    self.currentVolume = 0;
+    socket.emit('volume', 'reset');
+  }
 
   function updateVotes () {
     if (self.currentVolumeVote >= -10 && self.currentVolumeVote <= 10) {

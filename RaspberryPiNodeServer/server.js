@@ -25,7 +25,7 @@ request(harmonIp + '/v1/init_session', function(error, resp, body) {
     console.log('Connect to Harmon -- session id ' + harmonSession);
 
     request(
-      harmonIp + '/v1/get_volume?SessionID=1000',
+      harmonIp + '/v1/get_volume?SessionID=' + harmonSession,
       function(error, resp, body) {
         currentVolume = JSON.parse(JSON.parse(body).Volume);
         console.log('Current Volume ' + currentVolume);
@@ -193,6 +193,9 @@ io.on('connection', function (socket) {
         break;
       case "-1":
         volumeCounter--;
+        break;
+      case "reset":
+        volumeCounter = 0;
         break;
     }
 
