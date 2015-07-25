@@ -49,16 +49,15 @@ io.on('connection', function (socket) {
   });
 
   socket.on('genre', function (data) {
-      console.log("recieved genre: " + data);
-      var key = Object.keys(data)[0];
-      switch (data[key]) {
+    console.log("recieved genre: " + data);
+    var key = Object.keys(data)[0];
+    switch (data[key]) {
       case "+1":
-        if(genreCounter[key]==undefined)genreCounter[key]=0;
+        if (genreCounter[key] == undefined) genreCounter[key] = 0;
         genreCounter[key]++;
-        volumeCounter++;
         break;
       case "-1":
-        if(genreCounter[key]==undefined)genreCounter[key]=0;
+        if (genreCounter[key] == undefined) genreCounter[key] = 0;
         genreCounter[key]--;
         break;
     }
