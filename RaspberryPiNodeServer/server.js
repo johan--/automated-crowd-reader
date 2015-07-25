@@ -15,7 +15,7 @@ var harmonIp = '';
 var harmonSession ='';
 app.post('/myo_command/:command', function (req, res) {
   var command = req.param("command");
-  console.log(command);
+  console.log("myo)_command: "+command);
   switch (command) {
     case "volume_up":
       break;
@@ -30,7 +30,7 @@ app.post('/myo_command/:command', function (req, res) {
     case "start_stop":
       break;
   }
- res.sendStatus(200);
+ res.send("got command: "+command);
 
 });
 
@@ -47,6 +47,12 @@ var genreCounter = {};
 var crowdCounter =0;
 //Cached Data to poll to M2X
 var dataCache = [];
+
+
+//M2X
+var config = require("./config");
+var M2X = require("m2x");
+var m2xClient = new M2X(config.api_key);
 
 //Push data to M2X
 setInterval(function(){
