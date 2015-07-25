@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title></title>
+
+    <link href="lib/ionic/css/ionic.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+    <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
+    <link href="css/ionic.app.css" rel="stylesheet">
+    -->
+    <script src="lib/socket.io-client/socket.io.js"></script>
+
+    <!-- ionic/angularjs js -->
+    <script src="lib/ionic/js/ionic.bundle.js"></script>
+
+
+    <!-- cordova script (this will be a 404 during development) -->
+    <script src="cordova.js"></script>
+
+    <!-- your app's js -->
+    <script src="js/app.js"></script>
+    <script src="js/controllers.js"></script>
+    <script src="js/services.js"></script>
+  </head>
+  <body ng-app="impulse" ng-controller="TheController as main">
+
+    <ion-pane>
+      <ion-header-bar class="bar bar-header bar-light">
+        <h1 class="title">
+          Impulse
+        </h1>
+      </ion-header-bar>
+
+      <ion-content>
+        <section>
+          <h3 class="playing">Now Playing</h3>
+
+          <figure class="current-cover">
+            <img src="img/ionic.png" alt="">
+
+            <figcaption>
+              Title <br>
+              Band
+            </figcaption>
+
+            <a class="button right ion-chevron-right button-clear"></a>
+            <a class="button left ion-chevron-left button-clear"></a>
+          </figure>
+
+          <div class="actions">
+            <button class="icon ion-ios-plus-empty button">
+            </button>
+            <span class="fill-space"></span>
+            <button class="button ion-thumbsdown with-right-margin">
+            </button>
+            <button class="button ion-thumbsup">
+            </button>
+          </div>
+
+          <section class="volume">
+            <h3>Volume Request</h3>
+
+            <div class="row">
+              <div class="left">
+                <button class="icon ion-ios-minus-empty button"></button>
+              </div>
+              <div class="right">
+                <button class="icon ion-ios-plus-empty button"></button>
+              </div>
+            </div>
+
+            <svg class="feedback-bar" width="100" height="20" viewBox="0 0 320 20" xmlns="http://www.w3.org/2000/svg">
+              <rect x="164" y="4" width="50" height="12" style="
+                fill: #00FF86;
+              "></rect>
+              <rect x="159" y="0" width="2" height="20" style="
+                  fill: #77787C;
+              "></rect>
+            </svg>
+          </section>
+
+          <section class="genre">
+            <h3>Genre Request</h3>
+
+            <div class="dropdown"
+              ng-click="main.toggleDropdown()">
+              <span>Electronic</span>
+              <i class="icon ion-ios-arrow-down"></i>
+
+              <div class="dropdown-menu">
+                <div class="dropdown-item">Test</div>
+                <div class="dropdown-item">Test</div>
+                <div class="dropdown-item">Test</div>
+                <div class="dropdown-item">Test</div>
+                <div class="dropdown-item">Test</div>
+              </div>
+            </div>
+
+            <svg class="feedback-bar" width="100" height="20" viewBox="0 0 320 20" xmlns="http://www.w3.org/2000/svg">
+              <rect x="164" y="4" width="50" height="12" style="
+                fill: #00FF86;
+              "></rect>
+              <rect x="159" y="0" width="2" height="20" style="
+                  fill: #77787C;
+              "></rect>
+            </svg>
+          </section>
+        </section>
+      </ion-content>
+    </ion-pane>
+  </body>
+</html>
