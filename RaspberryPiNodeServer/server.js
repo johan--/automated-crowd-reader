@@ -246,7 +246,8 @@ io.on('connection', function (socket) {
   rssi: -81 }
 */
 var nodelist = {};
-var nAverageSamples = 10;
+var nAverageSamples = 2;
+var bDanceMode = 0;
 var EstimoteSticker = require('./estimote-sticker');
 EstimoteSticker.on('discover', function(estimoteSticker) {
  // console.log(estimoteSticker);
@@ -276,14 +277,33 @@ EstimoteSticker.on('discover', function(estimoteSticker) {
 		nRssiTotal += curEntry;
 	});
 
-	nodelist[uuid].averagerssi = nRssiTotal / nRssiEntries;
+	nodelist[uuid].averagerssi = Math.round(nRssiTotal / nRssiEntries);
 
 	var logArray = [];
-	Object(nodelist).keys.map(function(curKey) {
+	var nCloseNodes = 0;
+	Object.keys(nodelist).map(function(curKey) {
 		logArray.push(nodelist[curKey].averagerssi);
+		if (nodelist[curKey].averagerssi > -80) {
+			nCloseNodes ++;
+		}
 	});
 
-	console.log(logArray);
+	var nNodes = Object.keys(nodelist).length;
+
+	if (nCloseNodes / nNodes > 0.5) {
+		if (bDanceMode === 0) {
+			bDanceMode = 1;
+		    currentVolume = 40;
+		  request(harmonIp + '/v1/set_volume?SessionID=' + harmonSession +
+			'&Volume=' + currentVolume, function(err, res, body) {
+			  console.log('Volume changed to ' + currentVolume);
+			});
+		}
+			
+		console.log(libUtil.inspect(logArray) + ' Half of nodes are close');
+	} else {
+		console.log(libUtil.inspect(logArray));
+	}
 });
 
 EstimoteSticker.startScanning();
