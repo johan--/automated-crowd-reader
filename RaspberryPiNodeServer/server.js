@@ -275,7 +275,12 @@ EstimoteSticker.on('discover', function(estimoteSticker) {
 
 	nodelist[uuid].averagerssi = nRssiTotal / nRssiEntries;
 
-	console.log(nodelist[uuid].averagerssi);
+	var logArray = [];
+	Object(nodelist).keys.map(function(curKey) {
+		logArray.push(nodelist[curKey].averagerssi);
+	});
+
+	console.log(logArray);
 });
 
 EstimoteSticker.startScanning();
