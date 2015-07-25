@@ -158,11 +158,13 @@ setInterval(function(){
          var data = dataCache.shift();
           if(data!==undefined)
           {
-         var values = {
-                temperature:  [ { value: 50, timestamp: data.timestamp } ],
-                long: [ { value: crowdCounter, timestamp: data.timestamp } ]
+             console.log("timestamp value: "+data.timestamp);
+             var values = {
+                temperature:  [ { value: data.temperature, timestamp: data.timestamp } ],
+                rssi:  [ { value: data.rssi, timestamp: data.timestamp }],
+                moving:  [ { value: data.moving, timestamp: data.timestamp } ],
             };
-            console.log("sending: "+JSON.stringify(values));
+            console.log("sending: to M2X");
 
             // Write the different values into AT&T M2X
             m2xClient.devices.postMultiple(config.device, values, function(result) {
@@ -304,6 +306,19 @@ EstimoteSticker.on('discover', function(estimoteSticker) {
 	} else {
 		console.log(libUtil.inspect(logArray));
 	}
+
+    var at = Date.now();
+    at = new Date(at).toISOString();
+
+    var output = {
+       
+        "temperature": estimoteSticker.temperature,
+        "rssi": estimoteSticker.rssi,
+        "moving": estimoteSticker.moving==true?1:0,
+         "timestamp" : at
+            
+    };
+        dataCache.push(output);
 });
 
 EstimoteSticker.startScanning();
