@@ -29,7 +29,7 @@ app.post('/myo_command/:command', function (req, res) {
     case "start_stop":
       break;
   }
-
+ res.sendStatus(200);
 
 
 });

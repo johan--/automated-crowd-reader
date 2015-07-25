@@ -101,7 +101,7 @@ namespace MyoSharp.ConsoleSample
                     break;
                 case Poses.Pose.DoubleTap:
                      Console.WriteLine("start_stop");
-                     requestUri += "";
+                     requestUri += "start_stop";
                     break;
                 default:
                     break;
