@@ -126,6 +126,22 @@ io.on('connection', function (socket) {
 
 
 });
+/* format:
+{ id: '721e8bed36a69719',
+  uuid: 'd0d3fa86ca7645ec9bd96af4721e8bed36a69719',
+  type: 'SB0',
+  firmware: 'unknown',
+  bootloader: 'SB1.0.0',
+  temperature: 26.25,
+  moving: true,
+  batteryLevel: 'unknown',
+  acceleration: { x: -31.25, y: -62.5, z: -937.5 },
+  currentMotionStateDuration: 0,
+  previousMotionStateDuration: 360,
+  power: 4,
+  firmwareState: 'app',
+  rssi: -81 }
+*/
 var EstimoteSticker = require('./estimote-sticker');
 EstimoteSticker.on('discover', function(estimoteSticker) {
   console.log(estimoteSticker);
