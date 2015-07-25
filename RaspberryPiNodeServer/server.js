@@ -66,7 +66,20 @@ io.on('connection', function (socket) {
   });
 
   socket.on('myo_command', function (data) {
-    console.log(data);
+    switch (data) {
+      case "volume_up":
+        break;
+      case "volume_down":
+        break;
+      case "next_track":
+        break;
+      case "previous_track":
+        break;
+      case "play":
+        break;
+      case "pause":
+        break;
+    }
   });
 
 
