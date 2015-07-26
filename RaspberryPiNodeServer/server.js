@@ -25,6 +25,14 @@ request(harmonIp + '/v1/init_session', function(error, resp, body) {
     console.log('Connect to Harmon -- session id ' + harmonSession);
 
     request(
+      harmonIp + '/v1/set_party_mode?SessionID=' + harmonSession,
+      function(err, res, body) {
+        if (!err) {
+          console.log('Set to party mode');
+        }
+      });
+
+    request(
       harmonIp + '/v1/get_volume?SessionID=' + harmonSession,
       function(error, resp, body) {
         currentVolume = JSON.parse(JSON.parse(body).Volume);
@@ -87,6 +95,7 @@ app.post('/myo_command/:command', function (req, res) {
         },
         { for: 'everyone' }
       );
+      currentSong = playLists[currentPlayingId];
       break;
     case "previous_track":
       if (currentPlayingId > 0) {
@@ -108,12 +117,15 @@ app.post('/myo_command/:command', function (req, res) {
         },
         { for: 'everyone' }
       );
+      currentSong = playLists[currentPlayingId];
       break;
     case "play":
+      console.log(playLists[currentPlayingId].PersistentID);
       request(
         harmonIp + '/v1/play_hub_media?SessionID=' + harmonSession +
           '&PersistentID=' + playLists[currentPlayingId].PersistentID,
         function(err, res, body) {
+          console.log(body);
           if (!err) {
             console.log('Start playing song');
           }
@@ -124,6 +136,7 @@ app.post('/myo_command/:command', function (req, res) {
         },
         { for: 'everyone' }
       );
+      currentSong = playLists[currentPlayingId];
       break;
     case "start_stop":
       break;

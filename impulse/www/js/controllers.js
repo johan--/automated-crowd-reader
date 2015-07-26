@@ -6,9 +6,10 @@ angular.module('impulse.controllers', [])
   self.genres = ['Electronic', 'Jazz', 'Metal'];
   self.currentGenre = self.genres[0];
   self.currentSongId = 0;
+  self.playerStatus = 'Waiting';
 
   // configure the server ip
-  var SERVER_IP = '10.0.1.26';
+  var SERVER_IP = '10.0.1.14';
   var socket = io.connect('http://' + SERVER_IP + ':1337');
 
   var status_bar_dom = document.querySelector('.status-bar');
@@ -72,13 +73,11 @@ angular.module('impulse.controllers', [])
     self.currentVolumeVote = currentState.volume;
     self.currentGenres = currentState.genre;
     self.currentSong = currentState.currentSong;
+    self.currentSongPersistentId = self.currentSong.PersistentID;
+    self.playerStatus = 'Now Playing';
 
     console.log('Got state: ');
     console.log(currentState);
-
-    $interval(function() {
-      refreshVote();
-    }, 3000);
 
     updateVotes();
   });
@@ -96,6 +95,16 @@ angular.module('impulse.controllers', [])
     updateVotes();
   });
 
+  socket.on('change_song', function(currentSong) {
+    self.playList.forEach(function(song) {
+      if (song.PersistentID === currentSong.PersistentID) {
+        self.currentSong = song;
+        self.currentSongPersistentId = song.PersistentID;
+        self.playerStatus = 'Now Playing';
+      }
+    });
+  });
+
   self.nextSong = function() {
     if (self.currentSongId < self.playList.length - 1) {
       self.currentSongId ++;
@@ -103,6 +112,11 @@ angular.module('impulse.controllers', [])
       self.currentSongId = 0;
     }
     self.currentSong = self.playList[self.currentSongId];
+    if (self.currentSongPersistentId === self.currentSong.PersistentID) {
+      self.playerStatus = 'Now Playing';
+    } else {
+      self.playerStatus = 'Next Song';
+    }
   };
 
   self.previousSong = function() {
@@ -112,14 +126,23 @@ angular.module('impulse.controllers', [])
       self.currentSongId = self.playList.length - 1;
     }
     self.currentSong = self.playList[self.currentSongId];
+    if (self.currentSongPersistentId === self.currentSong.PersistentID) {
+      self.playerStatus = 'Now Playing';
+    } else {
+      self.playerStatus = 'Previous Song';
+    }
   };
 
   self.upvote = function() {
-    self.upvoted = !self.upvoted;
+    if (!self.currentSong.downvoted) {
+      self.currentSong.upvoted = !self.currentSong.upvoted;
+    }
   };
 
   self.downvote = function() {
-    self.downvoted = !self.downvoted;
+    if (!self.currentSong.upvoted) {
+      self.currentSong.downvoted = !self.currentSong.downvoted;
+    }
   };
 
   self.updateCurrentGenre = function(genre) {
@@ -156,26 +179,27 @@ angular.module('impulse.controllers', [])
   };
 
   self.addToPersonalAlbum = function() {
-    self.isInPersonalAlbum = !self.isInPersonalAlbum;
+    self.currentSong.isInPersonalAlbum = !self.currentSong.isInPersonalAlbum;
   };
 
   function refreshVote () {
     if (self.currentVolumeVote > 0) {
       self.currentVolume += 5;
+      console.log(self.currentVolume);
       $http.get(HARMAN_SERVER_IP + 'v1/set_volume?SessionID=' + self.harmanSession +
         '&Volume=' + self.currentVolume)
         .then(function(res) {
           console.log('Volume goes up');
         });
-    } else {
+    } else if (self.currentVolumeVote < 0) {
       self.currentVolume -= 5;
+      console.log('Reduce volume to ' + self.currentVolume);
       $http.get(HARMAN_SERVER_IP + 'v1/set_volume?SessionID=' + self.harmanSession +
         '&Volume=' + self.currentVolume)
         .then(function(res) {
           console.log('Volume goes down');
         });
     }
-    self.currentVolume = 0;
     socket.emit('volume', 'reset');
   }
 
@@ -195,6 +219,8 @@ angular.module('impulse.controllers', [])
         vote_dom_progress
           .setAttribute('x', 164);
       }
+    } else {
+      refreshVote();
     }
 
     genre_vote_dom.querySelector('.progress')

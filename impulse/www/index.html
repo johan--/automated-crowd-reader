@@ -32,7 +32,7 @@
     <ion-pane>
       <ion-content>
         <section>
-          <h3 class="playing">Now Playing</h3>
+          <h3 class="playing">{{main.playerStatus}}</h3>
 
           <figure class="current-cover"
             on-swipe-left="main.previousSong()"
@@ -55,21 +55,21 @@
           <div class="actions">
             <button class="icon ion-ios-plus-empty button"
               ng-class="{
-                'ion-ios-checkmark-empty': main.isInPersonalAlbum,
-                'ion-ios-plus-empty': !main.isInPersonalAlbum
+                'ion-ios-checkmark-empty': main.currentSong.isInPersonalAlbum,
+                'ion-ios-plus-empty': !main.currentSong.isInPersonalAlbum
               }"
               ng-click="main.addToPersonalAlbum()">
             </button>
             <span class="fill-space"></span>
             <button class="button ion-thumbsdown with-right-margin"
               ng-class="{
-                'active': main.downvoted
+                'active': main.currentSong.downvoted
               }"
               ng-click="main.downvote()">
             </button>
             <button class="button ion-thumbsup"
               ng-class="{
-                'active': main.upvoted
+                'active': main.currentSong.upvoted
               }"
               ng-click="main.upvote()">
             </button>
