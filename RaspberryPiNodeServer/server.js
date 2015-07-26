@@ -1,6 +1,7 @@
 //Express setup
 var express = require('express');
 var libUtil = require('util');
+var libBleacon = require('bleacon');
 var app = express();
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
@@ -173,16 +174,13 @@ setInterval(function(){
           {
              console.log("timestamp value: "+data.timestamp);
              var values = {
-                temperature:  [ { value: data.temperature, timestamp: data.timestamp } ],
-                rssi:  [ { value: data.rssi, timestamp: data.timestamp }],
-                moving:  [ { value: data.moving, timestamp: data.timestamp } ],
-                crowdcount:  [ { value: data.crowdcount, timestamp: data.timestamp } ]
+                rssi:  [ { value: data.rssi, timestamp: data.timestamp }]
             };
             console.log("sending: to M2X");
 
             // Write the different values into AT&T M2X
             m2xClient.devices.postMultiple(config.device, values, function(result) {
-                console.log(result);
+               // console.log(result);
             });
 
           }
@@ -261,8 +259,8 @@ io.on('connection', function (socket) {
   firmwareState: 'app',
   rssi: -81 }
 */
-var nodelist = {};
-var nAverageSamples = 2;
+/*var nodelist = {};
+var nAverageSamples = 3;
 var bDanceMode = 0;
 var EstimoteSticker = require('./estimote-sticker');
 EstimoteSticker.on('discover', function(estimoteSticker) {
@@ -306,10 +304,10 @@ EstimoteSticker.on('discover', function(estimoteSticker) {
 
 	var nNodes = Object.keys(nodelist).length;
 
-	if (nCloseNodes / nNodes > 0.5 && nCloseNodes >3) {
+	if (nCloseNodes / nNodes > 0.5 && nCloseNodes >=3) {
 		if (bDanceMode === 0) {
 			bDanceMode = 1;
-		    currentVolume = 40;
+		    currentVolume = 35;
 		  request(harmonIp + '/v1/set_volume?SessionID=' + harmonSession +
 			'&Volume=' + currentVolume, function(err, res, body) {
 			  console.log('Volume changed to ' + currentVolume);
@@ -336,5 +334,116 @@ EstimoteSticker.on('discover', function(estimoteSticker) {
         dataCache.push(output);
 });
 
-EstimoteSticker.startScanning();
+EstimoteSticker.startScanning();*/
 
+var nodelist = {};
+var trackingTimeout = 5000;
+var nearThreshold = -65;
+var nAverageSamples = 10;
+var bDanceMode = 0;
+var targetUuid = '8492e75f4fd6469db132043fe94921d8';
+
+libBleacon.startScanning([targetUuid]);
+
+libBleacon.on('discover', function(bleacon) { 
+	var uuid = bleacon.uuid;
+	var major = bleacon.major;
+	var minor = bleacon.minor;
+	var measuredPower = bleacon.measuredPower;
+	var rssi = bleacon.rssi;
+	var accuracy = bleacon.accuracy;
+	var proximity = bleacon.proximity;
+
+	if (!(uuid in nodelist)) {
+		nodelist[uuid] = {rssiarray: []};
+	}
+
+	nodelist[uuid].major = major,
+	nodelist[uuid].minor = minor,
+	nodelist[uuid].measuredPower = measuredPower,
+	nodelist[uuid].rssi = rssi,
+	nodelist[uuid].accuracy = accuracy,
+	nodelist[uuid].proximity = proximity,
+	nodelist[uuid].lastupdate = Date.now()
+
+	var rssiArray = nodelist[uuid].rssiarray;
+
+	rssiArray.push(rssi);
+
+	if (rssiArray.length > (nAverageSamples + 4)) {
+		rssiArray.shift();
+	}
+
+	var averageArray = rssiArray.slice(0);
+	if (averageArray.length == nAverageSamples + 4) {
+		averageArray.splice(averageArray.indexOf(Math.max.apply(Math, averageArray)), 1);
+		averageArray.splice(averageArray.indexOf(Math.max.apply(Math, averageArray)), 1);
+		averageArray.splice(averageArray.indexOf(Math.min.apply(Math, averageArray)), 1);
+		averageArray.splice(averageArray.indexOf(Math.min.apply(Math, averageArray)), 1);
+	}
+
+	var nRssiTotal = 0;
+	var nRssiEntries = averageArray.length;
+
+	averageArray.map(function(curEntry) {
+		nRssiTotal += curEntry;
+	});
+
+	nodelist[uuid].averagerssi = Math.round(nRssiTotal / nRssiEntries);
+
+//console.log(nodelist[uuid].averagerssi);
+	
+});
+
+var bDanceMode = 0;
+function report() {
+	var curTime = Date.now();
+	var oldKeys = [];
+/*
+	Object.keys(nodelist).map(function(curKey) {
+		if ((curTime - nodelist[curKey].lastupdate) > trackingTimeout) {
+			oldKeys.push(curKey);
+		}
+	});
+
+	oldKeys.map(function(curKey) {
+		delete nodelist[curKey];
+	});
+*/
+	//console.log('\n' + libUtil.inspect(nodelist, {depth: null}));
+	if (Object.keys(nodelist).length > 0) {
+		var averageRssi = nodelist[Object.keys(nodelist)[0]].averagerssi;
+		console.log(averageRssi);
+
+		var at = Date.now();
+		at = new Date(at).toISOString();
+
+		var output = {
+		   
+			"rssi": averageRssi,
+			 "timestamp" : at
+				
+		};
+        dataCache.push(output);
+		if (averageRssi >= -59 && bDanceMode === 0) {
+			bDanceMode = 1;
+		    currentVolume = 35;
+		  request(harmonIp + '/v1/set_volume?SessionID=' + harmonSession +
+			'&Volume=' + currentVolume, function(err, res, body) {
+			  console.log('Volume changed to ' + currentVolume);
+			});
+		}
+	}
+	/*if (targetUuid in nodelist) {
+		if (nodelist[targetUuid].averagerssi > nearThreshold) {
+			console.log(nodelist[targetUuid].averagerssi + 'Target is near');
+		} else {
+			console.log(nodelist[targetUuid].averagerssi + 'Target is far');
+		}
+	} else {
+		console.log('Target not found');
+	}*/
+	
+}
+
+setInterval(report, 300);
